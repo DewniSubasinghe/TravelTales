@@ -1,0 +1,91 @@
+<%- include('../partials/header', { title: 'Account Settings' }) %>
+  <section class="user-settings">
+    <h1><i class="fas fa-cog"></i> Account Settings</h1>
+    
+    <div class="settings-tabs">
+      <button class="tab-btn active" data-tab="profile">Profile</button>
+      <button class="tab-btn" data-tab="security">Security</button>
+      <button class="tab-btn" data-tab="notifications">Notifications</button>
+    </div>
+    
+    <div class="tab-content active" id="profile-tab">
+      <form id="profile-form" method="POST" action="/user/<%= user.id %>" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" value="<%= user.username %>" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" value="<%= user.email %>" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="bio">Bio</label>
+          <textarea id="bio" name="bio" rows="3"><%= user.bio || '' %></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="profilePicture">Profile Picture</label>
+          <div class="current-avatar">
+            <img src="<%= user.profilePicture || '/images/default-avatar.jpg' %>" alt="Current profile picture">
+          </div>
+          <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </form>
+    </div>
+    
+    <div class="tab-content" id="security-tab">
+      <form id="password-form" method="POST" action="/user/<%= user.id %>/password">
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" id="currentPassword" name="currentPassword" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" name="newPassword" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Change Password</button>
+      </form>
+    </div>
+    
+    <div class="tab-content" id="notifications-tab">
+      <form id="notifications-form" method="POST" action="/user/<%= user.id %>/notifications">
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" name="emailNotifications" <%= userSettings.emailNotifications ? 'checked' : '' %>>
+            Email Notifications
+          </label>
+          <p class="hint">Receive email notifications for new followers and comments</p>
+        </div>
+        
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" name="pushNotifications" <%= userSettings.pushNotifications ? 'checked' : '' %>>
+            Push Notifications
+          </label>
+          <p class="hint">Get browser notifications for new activity</p>
+        </div>
+        
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" name="weeklyDigest" <%= userSettings.weeklyDigest ? 'checked' : '' %>>
+            Weekly Digest
+          </label>
+          <p class="hint">Receive a weekly summary of popular posts</p>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Preferences</button>
+      </form>
+    </div>
+  </section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,47 @@
+<%- include('../partials/header', { title }) %>
+
+<section class="user-search-results">
+  <div class="container">
+    <h1><%= title %></h1>
+    
+    <% if (users && users.length > 0) { %>
+      <div class="users-grid">
+        <% users.forEach(user => { %>
+          <div class="user-card">
+            <div class="user-header">
+              <h3><a href="/users/<%= user.id %>"><%= user.username %></a></h3>
+              <p class="post-count"><%= user.postCount %> travel tales</p>
+            </div>
+            
+            <% if (user.BlogPosts && user.BlogPosts.length > 0) { %>
+              <div class="recent-posts">
+                <h4>Recent Posts:</h4>
+                <ul>
+                  <% user.BlogPosts.slice(0, 3).forEach(post => { %>
+                    <li>
+                      <a href="/blog/<%= post.id %>"><%= post.title %></a>
+                      <span class="post-country"><%= post.countryName %></span>
+                    </li>
+                  <% }); %>
+                </ul>
+              </div>
+            <% } else { %>
+              <p class="no-posts">No travel tales yet.</p>
+            <% } %>
+            
+            <a href="/users/<%= user.id %>" class="btn btn-primary view-profile">
+              View Profile
+            </a>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="no-results">
+        <p>No users found matching "<%= searchQuery %>"</p>
+        <a href="/" class="btn btn-primary">Back to Home</a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

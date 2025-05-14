@@ -1,0 +1,122 @@
+<%- include('partials/header', { title: 'TravelTales - Home' }) %>
+
+<main class="container">
+  <section class="hero">
+    <h1>Welcome to TravelTales!</h1>
+    <p>Share your travel stories with the world</p>
+   
+    <% if (!isAuthenticated) { %>
+      <div class="auth-buttons">
+        <a href="/auth/register" class="btn btn-primary">Register</a>
+        <a href="/auth/login" class="btn btn-secondary">Login</a>
+      </div>
+    <% } else { %>
+      <div class="user-actions">
+        <p>Welcome back, <%= user.username %>!</p>
+        <a href="/users/<%= user.id %>" class="btn btn-primary">View Profile</a>
+        <a href="/blog/create" class="btn btn-success">Create Post</a>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Country Search Dropdown -->
+  <section class="country-search">
+    <h2>Explore Countries</h2>
+    <form action="/search" method="GET">
+      <select name="country" class="form-control">
+        <option value="">Select a country</option>
+        <% countries.forEach(country => { %>
+          <option value="<%= country %>"><%= country %></option>
+        <% }); %>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </section>
+
+  <!-- Connect With Travelers Section -->
+  <section class="travel-buddies-search">
+    <h2><i class="fas fa-users"></i> Connect With Travelers</h2>
+    <% if (isAuthenticated) { %>
+      <form action="/search/users" method="GET" class="buddies-search-form">
+        <div class="search-input-group">
+          <input type="text" name="username" placeholder="Search by username..." required>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Find
+          </button>
+        </div>
+      </form>
+    <% } else { %>
+      <div class="register-prompt">
+        <p>Register to find and connect with more travel enthusiasts</p>
+        <div class="auth-buttons">
+          <a href="/auth/register" class="btn btn-primary">Register</a>
+          <a href="/auth/login" class="btn btn-secondary">Login</a>
+        </div>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Recent Posts -->
+  <section class="recent-posts">
+    <h2>Recent Travel Tales</h2>
+    <% if (recentPosts && recentPosts.length > 0) { %>
+      <div class="posts-grid">
+        <% recentPosts.forEach(post => { %>
+          <div class="post-card">
+            <h3><a href="/blog/<%= post.id %>"><%= post.title %></a></h3>
+            <p class="post-meta">
+              <% if (isAuthenticated) { %>
+                By <a href="/users/<%= post.User.id %>"><%= post.User.username %></a> |
+              <% } else { %>
+                By <span class="register-to-view" title="Register to view profile"><%= post.User.username %></span> |
+              <% } %>
+              <%= post.countryName %> |
+              <%= new Date(post.createdAt).toLocaleDateString() %>
+            </p>
+            <p class="post-excerpt"><%= post.content.substring(0, 150) %>...</p>
+            <!-- <div class="post-stats">
+              <span><i class="fas fa-thumbs-up"></i> <%= post.likeCount || 0 %></span>
+              <span><i class="fas fa-thumbs-down"></i> <%= post.dislikeCount || 0 %></span>
+              <span><i class="fas fa-comment"></i> <%= post.commentCount || 0 %></span>
+            </div> -->
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p>No posts yet. Be the first to share your travel story!</p>
+    <% } %>
+  </section>
+
+  <!-- Popular Posts -->
+  <section class="popular-posts">
+    <h2>Popular Travel Tales</h2>
+    <% if (popularPosts && popularPosts.length > 0) { %>
+      <div class="posts-grid">
+        <% popularPosts.forEach(post => { %>
+          <div class="post-card">
+            <h3><a href="/blog/<%= post.id %>"><%= post.title %></a></h3>
+            <p class="post-meta">
+              <% if (isAuthenticated) { %>
+                By <a href="/users/<%= post.User.id %>"><%= post.User.username %></a> |
+              <% } else { %>
+                By <span class="register-to-view" title="Register to view profile"><%= post.User.username %></span> |
+              <% } %>
+              <%= post.countryName %> |
+              <%= new Date(post.createdAt).toLocaleDateString() %>
+            </p>
+            <p class="post-excerpt"><%= post.content.substring(0, 150) %>...</p>
+            <!-- <div class="post-stats">
+              <span><i class="fas fa-thumbs-up"></i> <%= post.likeCount || 0 %></span>
+              <span><i class="fas fa-thumbs-down"></i> <%= post.dislikeCount || 0 %></span>
+              <span><i class="fas fa-comment"></i> <%= post.commentCount || 0 %></span>
+            </div> -->
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p>No popular posts yet.</p>
+    <% } %>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

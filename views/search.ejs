@@ -1,0 +1,57 @@
+<%- include('./partials/header', { title: 'Search Travel Tales' }) %>
+
+<section class="search-results">
+  <div class="container">
+    <h1>Search Results</h1>
+   
+    <% if (country && countryData) { %>
+      <div class="country-info">
+        <% if (countryData.flag) { %>
+          <img src="<%= countryData.flag %>" alt="<%= country %> flag">
+        <% } %>
+        <div>
+          <h2><%= country %></h2>
+          <p><strong>Capital:</strong> <%= countryData.capital %></p>
+          <p><strong>Currency:</strong> <%= countryData.currencies.join(', ') %></p>
+          <% if (countryData.region) { %>
+            <p><strong>Region:</strong> <%= countryData.region %></p>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+    <% if (posts && posts.length > 0) { %>
+      <div class="posts-list">
+        <% posts.forEach(post => { %>
+          <article class="post">
+            <h2><a href="/blog/<%= post.id %>"><%= post.title %></a></h2>
+            <p class="meta">
+              By <a href="/users/<%= post.User.id %>"><%= post.User.username %></a> |
+              <%= post.countryName %> |
+              <%= new Date(post.createdAt).toLocaleDateString() %>
+            </p>
+            <p class="excerpt"><%= post.content.substring(0, 150) %>...</p>
+            <div class="post-stats">
+              <span><i class="fas fa-thumbs-up"></i> <%= post.likeCount %></span>
+              <span><i class="fas fa-thumbs-down"></i> <%= post.dislikeCount %></span>
+              <span><i class="fas fa-comment"></i> <%= post.commentCount %></span>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="no-results">
+        <p>No posts found matching your search criteria.</p>
+        <% if (user) { %>
+          <a href="/blog/create<% if (country) { %>?country=<%= country %><% } %>" class="btn btn-primary">
+            Share your experience!
+          </a>
+        <% } else { %>
+          <p><a href="/auth/login">Log in</a> to share your travel story.</p>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('./partials/footer') %>

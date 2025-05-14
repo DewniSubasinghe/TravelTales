@@ -1,0 +1,87 @@
+<%- include('../partials/header', { title: 'All Travel Tales' }) %>
+  <section class="blog-list">
+    <div class="list-header">
+      <h1><i class="fas fa-book-open"></i> All Travel Tales</h1>
+     
+      <div class="list-controls">
+        <div class="sort-options">
+          <span>Sort by:</span>
+          <a href="?sort=newest" class="<%= typeof sort !== 'undefined' && sort === 'newest' ? 'active' : '' %>">
+            Newest
+          </a>
+          <a href="?sort=popular" class="<%= typeof sort !== 'undefined' && sort === 'popular' ? 'active' : '' %>">
+            Most Popular
+          </a>
+          <a href="?sort=commented" class="<%= typeof sort !== 'undefined' && sort === 'commented' ? 'active' : '' %>">
+            Most Comments
+          </a>
+        </div>
+
+        <% if (user) { %>
+          <a href="/blog/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Post
+          </a>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (posts.length > 0) { %>
+      <div class="posts-grid">
+        <% posts.forEach(post => { %>
+          <article class="post-card">
+            <a href="/blog/<%= post.id %>" class="post-image">
+              <% if (post.images && post.images.length > 0) { %>
+                <img src="/uploads/<%= post.images[0] %>" alt="<%= post.title %>">
+              <% } else { %>
+                <div class="default-image">
+                  <i class="fas fa-mountain"></i>
+                </div>
+              <% } %>
+            </a>
+
+            <div class="post-content">
+              <h2><a href="/blog/<%= post.id %>"><%= post.title %></a></h2>
+             
+              <div class="post-meta">
+                <a href="/users/<%= post.User.id %>" class="author">
+                  <img src="<%= post.User.profilePicture || '/images/default-avatar.jpg' %>"
+                       alt="<%= post.User.username %>">
+                  <%= post.User.username %>
+                </a>
+                <span class="country">
+                  <i class="fas fa-map-marker-alt"></i> <%= post.countryName %>
+                </span>
+              </div>
+
+              <p class="post-excerpt">
+                <%= post.content.substring(0, 150) %>...
+                <a href="/blog/<%= post.id %>">Read more</a>
+              </p>
+
+              <div class="post-stats">
+                <span><i class="fas fa-thumbs-up"></i> <%= post.likeCount %></span>
+                <span><i class="fas fa-comment"></i> <%= post.commentCount %></span>
+                <span><i class="fas fa-calendar-alt"></i> <%= new Date(post.visitDate).toLocaleDateString() %></span>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <i class="fas fa-compass"></i>
+        <h2>No posts found</h2>
+        <p>No one has shared their travel stories yet.</p>
+        <% if (user) { %>
+          <a href="/blog/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Be the first to share
+          </a>
+        <% } else { %>
+          <a href="/auth/register" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Join to share your story
+          </a>
+        <% } %>
+      </div>
+    <% } %>
+  </section>
+<%- include('../partials/footer') %>

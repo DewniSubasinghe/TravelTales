@@ -1,0 +1,41 @@
+<%- include('../partials/header', { title: 'Your Feed' }) %>
+
+<main class="container">
+  <section class="feed-container">
+    <h1>Your Travel Feed</h1>
+    
+    <% if (posts && posts.length > 0) { %>
+      <div class="posts-grid">
+        <% posts.forEach(post => { %>
+          <article class="post-card">
+            <h2><a href="/blog/<%= post.id %>"><%= post.title %></a></h2>
+            <div class="post-meta">
+              <a href="/users/<%= post.User.id %>">
+                <img src="/images/default-avatar.jpg" alt="<%= post.User.username %>" class="post-author-avatar">
+                <%= post.User.username %>
+              </a>
+              <span><%= new Date(post.createdAt).toLocaleDateString() %></span>
+            </div>
+            <p class="post-excerpt"><%= post.content.substring(0, 150) %>...</p>
+            <div class="post-stats">
+              <span><i class="fas fa-thumbs-up"></i> <%= post.likeCount %></span>
+              <span><i class="fas fa-comment"></i> <%= post.commentCount %></span>
+              <span><i class="fas fa-globe"></i> <%= post.countryName %></span>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-feed">
+        <i class="fas fa-compass"></i>
+        <h2>Your feed is empty</h2>
+        <p>Follow other travelers to see their posts here.</p>
+        <a href="/search" class="btn btn-primary">
+          <i class="fas fa-search"></i> Discover travelers
+        </a>
+      </div>
+    <% } %>
+  </section>
+</main>
+
+<%- include('../partials/footer') %>

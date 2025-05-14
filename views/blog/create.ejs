@@ -1,0 +1,41 @@
+<%- include('../partials/header', { title }) %>
+
+<main class="container">
+  <div class="create-post">
+    <h1>Create New Post</h1>
+   
+    <% if (errors && errors.length > 0) { %>
+      <div class="alert alert-danger">
+        <% errors.forEach(error => { %>
+          <p><%= error.msg %></p>
+        <% }); %>
+      </div>
+    <% } %>
+   
+    <form action="/blog" method="POST">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" value="<%= formData && formData.title || '' %>" required>
+      </div>
+     
+      <div class="form-group">
+        <label for="country">Country</label>
+        <input type="text" id="country" name="countryName" value="<%= formData && formData.countryName || '' %>" required>
+      </div>
+     
+      <div class="form-group">
+        <label for="visitDate">Visit Date</label>
+        <input type="date" id="visitDate" name="visitDate" value="<%= formData && formData.visitDate || '' %>" required>
+      </div>
+     
+      <div class="form-group">
+        <label for="content">Your Story</label>
+        <textarea id="content" name="content" rows="15" style="width: 100%; min-height: 300px;" required><%= formData && formData.content || '' %></textarea>
+      </div>
+     
+      <button type="submit" class="btn btn-primary">Publish</button>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

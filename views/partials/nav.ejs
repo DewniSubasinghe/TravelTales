@@ -1,0 +1,15 @@
+<nav class="main-nav">
+  <ul>
+    <li><a href="/"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="/search"><i class="fas fa-search"></i> Search</a></li>
+    <% if (user) { %>
+      <li><a href="/user/feed"><i class="fas fa-newspaper"></i> My Feed</a></li>
+      <li><a href="/blog/create"><i class="fas fa-plus"></i> New Post</a></li>
+      <li><a href="/user/profile"><i class="fas fa-user"></i> Profile</a></li>
+      <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    <% } else { %>
+      <li><a href="/auth/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+      <li><a href="/auth/register"><i class="fas fa-user-plus"></i> Register</a></li>
+    <% } %>
+  </ul>
+</nav>

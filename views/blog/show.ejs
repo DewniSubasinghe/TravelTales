@@ -1,0 +1,167 @@
+<%- include('../partials/header', { title: post.title }) %>
+
+<main class="container">
+  <article class="blog-post">
+    <h1><%= post.title %></h1>
+   
+    <div class="post-meta">
+      <span>By <a href="/users/<%= post.User.id %>"><%= post.User.username %></a></span>
+      <span>Posted on <%= new Date(post.createdAt).toDateString() %></span>
+      <span>Visited on <%= new Date(post.visitDate).toDateString() %></span>
+    </div>
+
+    <% if (countryData) { %>
+      <div class="country-info">
+        <% if (countryData.flag) { %>
+          <img src="<%= countryData.flag %>" alt="<%= post.countryName %> flag">
+        <% } %>
+        <div>
+          <h3>About <%= post.countryName %></h3>
+          <p><strong>Capital:</strong> <%= countryData.capital %></p>
+          <p><strong>Currency:</strong> <%= countryData.currencies.join(', ') %></p>
+          <% if (countryData.region) { %>
+            <p><strong>Region:</strong> <%= countryData.region %></p>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="post-content">
+      <%= post.content %>
+    </div>
+
+    <div class="post-actions">
+      <button type="button" class="btn <%= post.userLiked ? 'btn-primary' : 'btn-secondary' %> like-btn"
+        data-post="<%= post.id %>">
+        <i class="fas fa-thumbs-up"></i> <span class="like-count"><%= post.likeCount %></span>
+      </button>
+      <button type="button" class="btn <%= post.userDisliked ? 'btn-danger' : 'btn-secondary' %> dislike-btn"
+        data-post="<%= post.id %>">
+        <i class="fas fa-thumbs-down"></i> <span class="dislike-count"><%= post.dislikeCount %></span>
+      </button>
+      <% if (user && user.id === post.userId) { %>
+        <a href="/blog/<%= post.id %>/edit" class="btn btn-primary">Edit</a>
+        <form action="/blog/<%= post.id %>/delete" method="POST" style="display: inline;">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      <% } %>
+    </div>
+
+    <div class="comments-section" id="comments">
+      <h3>Comments (<%= post.commentCount %>)</h3>
+     
+      <% if (post.Comments && post.Comments.length > 0) { %>
+        <% post.Comments.forEach(comment => { %>
+          <div class="comment">
+            <div class="comment-author">
+              <span class="comment-avatar"><%= comment.User.username.charAt(0).toUpperCase() %></span>
+              <div>
+                <a href="/users/<%= comment.User.id %>"><%= comment.User.username %></a>
+                <small><%= new Date(comment.createdAt).toLocaleString() %></small>
+              </div>
+            </div>
+            <div class="comment-content">
+              <p><%= comment.content %></p>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p>No comments yet.</p>
+      <% } %>
+
+      <% if (user) { %>
+        <form class="comment-form" method="POST" action="/blog/<%= post.id %>/comment">
+          <div class="form-group">
+            <label for="comment">Add a comment:</label>
+            <textarea id="comment" name="content" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+      <% } else { %>
+        <p><a href="/auth/login">Log in</a> to leave a comment</p>
+      <% } %>
+    </div>
+  </article>
+</main>
+
+<script>
+  document.querySelectorAll('.like-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      const postId = e.target.closest('.like-btn').dataset.post;
+      try {
+        const response = await fetch(`/blog/${postId}/like`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          const likeBtn = e.target.closest('.like-btn');
+          const dislikeBtn = document.querySelector(`.dislike-btn[data-post="${postId}"]`);
+          
+          if (result.action === 'liked') {
+            likeBtn.classList.add('btn-primary');
+            likeBtn.classList.remove('btn-secondary');
+            dislikeBtn.classList.remove('btn-danger');
+            dislikeBtn.classList.add('btn-secondary');
+          } else if (result.action === 'removed') {
+            likeBtn.classList.remove('btn-primary');
+            likeBtn.classList.add('btn-secondary');
+          }
+          
+          const likeCountElement = likeBtn.querySelector('.like-count');
+          const dislikeCountElement = dislikeBtn.querySelector('.dislike-count');
+          if (likeCountElement) likeCountElement.textContent = result.likeCount;
+          if (dislikeCountElement) dislikeCountElement.textContent = result.dislikeCount;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  });
+
+  document.querySelectorAll('.dislike-btn').forEach(button => {
+    button.addEventListener('click', async (e) => {
+      const postId = e.target.closest('.dislike-btn').dataset.post;
+      try {
+        const response = await fetch(`/blog/${postId}/dislike`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          const dislikeBtn = e.target.closest('.dislike-btn');
+          const likeBtn = document.querySelector(`.like-btn[data-post="${postId}"]`);
+          
+          if (result.action === 'disliked') {
+            dislikeBtn.classList.add('btn-danger');
+            dislikeBtn.classList.remove('btn-secondary');
+            likeBtn.classList.remove('btn-primary');
+            likeBtn.classList.add('btn-secondary');
+          } else if (result.action === 'removed') {
+            dislikeBtn.classList.remove('btn-danger');
+            dislikeBtn.classList.add('btn-secondary');
+          }
+          
+          const likeCountElement = likeBtn.querySelector('.like-count');
+          const dislikeCountElement = dislikeBtn.querySelector('.dislike-count');
+          if (likeCountElement) likeCountElement.textContent = result.likeCount;
+          if (dislikeCountElement) dislikeCountElement.textContent = result.dislikeCount;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>

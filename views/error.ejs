@@ -1,0 +1,12 @@
+<%- include('partials/header', { title }) %>
+
+<section class="error-container">
+  <h1><%= title %></h1>
+  <p><%= message %></p>
+  <% if (typeof error !== 'undefined') { %>
+    <p class="error-details"><%= error %></p>
+  <% } %>
+  <a href="/" class="btn btn-primary">Return Home</a>
+</section>
+
+<%- include('partials/footer') %>

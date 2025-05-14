@@ -1,0 +1,137 @@
+<%- include('../partials/header', { title: title }) %>
+
+<main class="container">
+  <div class="profile-page">
+    <div class="profile-header">
+      <!-- <div class="profile-picture">
+        <img src="/images/default-avatar.jpg" alt="<%= user.username %>">
+      </div> -->
+      <h1><%= user.username %></h1>
+      <p>Member since <%= new Date(user.createdAt).toLocaleDateString() %></p>
+      
+      <div class="follow-stats">
+        <div>
+          <span class="count"><%= user.Followers ? user.Followers.length : 0 %></span>
+          <span>Followers</span>
+        </div>
+        <div>
+          <span class="count"><%= user.Following ? user.Following.length : 0 %></span>
+          <span>Following</span>
+        </div>
+        <div>
+          <span class="count"><%= user.BlogPosts ? user.BlogPosts.length : 0 %></span>
+          <span>Posts</span>
+        </div>
+      </div>
+
+      <% if (currentUser && currentUser.id !== user.id) { %>
+        <button class="btn <%= user.Followers && user.Followers.some(f => f.id === currentUser.id) ? 'btn-secondary' : 'btn-primary' %> follow-btn"
+                data-user="<%= user.id %>">
+          <%= user.Followers && user.Followers.some(f => f.id === currentUser.id) ? 'Following' : 'Follow' %>
+        </button>
+      <% } %>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-posts">
+        <h2><%= user.id === currentUser?.id ? 'Your' : user.username + "'s" %> Travel Tales</h2>
+        <% if (user.BlogPosts && user.BlogPosts.length > 0) { %>
+          <div class="posts-grid">
+            <% user.BlogPosts.forEach(post => { %>
+              <div class="post-card">
+                <h3><a href="/blog/<%= post.id %>"><%= post.title %></a></h3>
+                <p class="post-meta">
+                  <i class="fas fa-globe"></i> <%= post.countryName %> |
+                  <i class="fas fa-calendar-alt"></i> <%= new Date(post.visitDate).toLocaleDateString() %>
+                </p>
+                <div class="post-stats">
+                  <span><i class="fas fa-thumbs-up"></i> <%= post.likeCount %></span>
+                  <span><i class="fas fa-comment"></i> <%= post.commentCount %></span>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p><%= user.id === currentUser?.id ? "You haven't" : user.username + " hasn't" %> posted any travel tales yet.</p>
+        <% } %>
+      </div>
+
+      <div class="profile-follow">
+        <div class="followers">
+          <h3>Followers</h3>
+          <% if (user.Followers && user.Followers.length > 0) { %>
+            <ul>
+              <% user.Followers.forEach(follower => { %>
+                <li>
+                  <a href="/users/<%= follower.id %>"><%= follower.username %></a>
+                </li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            <p>No followers yet.</p>
+          <% } %>
+        </div>
+
+        <div class="following">
+          <h3>Following</h3>
+          <% if (user.Following && user.Following.length > 0) { %>
+            <ul>
+              <% user.Following.forEach(following => { %>
+                <li>
+                  <a href="/users/<%= following.id %>"><%= following.username %></a>
+                </li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            <p><%= user.id === currentUser?.id ? "You're" : user.username + " is" %> not following anyone yet.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const followBtn = document.querySelector('.follow-btn');
+  if (followBtn) {
+    followBtn.addEventListener('click', async () => {
+      const userId = followBtn.dataset.user;
+      try {
+        const response = await fetch(`/users/${userId}/follow`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          if (result.followed) {
+            followBtn.textContent = 'Following';
+            followBtn.classList.add('btn-secondary');
+            followBtn.classList.remove('btn-primary');
+          } else {
+            followBtn.textContent = 'Follow';
+            followBtn.classList.add('btn-primary');
+            followBtn.classList.remove('btn-secondary');
+          }
+          
+          // Update follower count
+          const followerCountElement = document.querySelector('.follow-stats .count:first-child');
+          if (followerCountElement) {
+            const currentCount = parseInt(followerCountElement.textContent);
+            followerCountElement.textContent = result.followed ? currentCount + 1 : currentCount - 1;
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  }
+});
+</script>
